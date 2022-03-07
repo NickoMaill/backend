@@ -28,11 +28,11 @@ app.get("/", (req, res) => {
     res.send("Authors API");
 });
 
-app.get("/authors/:authorsId", (req, res) => {
-    const author = authors[parseInt(req.params.authorsId)]
+app.get("/authors/:id", (req, res) => {
+    const author = authors[parseInt(req.params.id)]
 
-    if (authors.indexOf(author).toString() === req.params.authorsId) {
-        return res.send(author.name + "," + author.nationality);
+    if (authors.indexOf(author).toString() === req.params.id) {
+        return res.json({ name: author.name, nationality: author.nationality })
 
     } else {
         return res.send("This author does not exist")
@@ -40,11 +40,11 @@ app.get("/authors/:authorsId", (req, res) => {
 
 });
 
-app.get("/authors/:authorsId/books/", (req, res) => {
-    const author = authors[parseInt(req.params.authorsId)]
+app.get("/authors/:id/books/", (req, res) => {
+    const author = authors[parseInt(req.params.id)]
 
-    if (authors.indexOf(author).toString() === req.params.authorsId) {
-        return res.send(author.books.join(", "));
+    if (authors.indexOf(author).toString() === req.params.id) {
+        return res.json(author.books);
 
     } else {
         return res.send("This author does not exist")
