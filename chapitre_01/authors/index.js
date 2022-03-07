@@ -40,6 +40,17 @@ app.get("/authors/:authorsId", (req, res) => {
 
 });
 
+app.get("/authors/:authorsId/books/", (req, res) => {
+    const author = authors[parseInt(req.params.authorsId)]
+
+    if (authors.indexOf(author).toString() === req.params.authorsId) {
+        return res.send(author.books.join(", "));
+
+    } else {
+        return res.send("This author does not exist")
+    }
+})
+
 
 app.listen(8000, () => {
     console.log("Listening on port 8000");
