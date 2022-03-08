@@ -1,6 +1,7 @@
 const express = require("express");
 const app = express();
 const authors = require("./data/authors.json")
+const fs = require("fs");
 
 app.get("/", (_req, res) => {
     res.send("Authors API");
