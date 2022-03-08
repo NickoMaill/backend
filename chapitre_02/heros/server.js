@@ -59,25 +59,29 @@ function transformName(req, res, next) {
     next();
 }
 
-// app.post("/heroes", (req, res) => {
-//     superHeroes.push({
-//         name: req.body.name,
-//         power: req.body.power,
-//         color: req.body.color,
-//         isAlive: req.body.isAlive,
-//         age: req.body.age,
-//         image: req.body.image
-//     });
-//     console.log('ok, hero added');
-//     res.json(superHeroes);
-// })
-
-app.post("/heroes/", transformName, (req, res) => {
-    const superHero = superHeroes.map((hero) => {
-        return hero.name.toLowerCase();
+app.post("/heroes", transformName, (req, res) => {
+    const superHero = superHeroes.map((heros) => {
+        return heros.name.toLowerCase();
     });
 
-});
+
+    if (superHero.indexOf(req.body.name) > -1) {
+        res.send("ce héro éxiste déjà, rentrez en un autre :D ")
+    } else {
+        superHeroes.push({
+            name: req.body.name,
+            power: req.body.power,
+            color: req.body.color,
+            isAlive: req.body.isAlive,
+            age: req.body.age,
+            image: req.body.image
+        });
+        console.log(superHero.indexOf(req.body.name));
+        res.send('ok, héro ajouté !:)');
+
+    }
+
+})
 //copy and paste this in postman
 
 // {
