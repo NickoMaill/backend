@@ -2,9 +2,13 @@ const express = require("express");
 const app = express();
 const authors = require("./data/authors.json")
 
-app.get("/", (req, res) => {
+app.get("/", (_req, res) => {
     res.send("Authors API");
 });
+
+// app.get("*", (_req, res) => {
+//     res.status(404).send("Page not found")
+// })
 
 app.get("/authors/:id", (req, res) => {
     const author = authors[parseInt(req.params.id)]
