@@ -1,7 +1,7 @@
 const express = require("express");
 const app = express();
 const fs = require("fs");
-const superHeroes = require('./data/herosData.json');
+// const superHeroes = require('./data/herosData.json');
 
 function debug(_req, _res, next) {
     console.log('request receive');
@@ -20,7 +20,42 @@ function findHero(req, _res, next) {
     req.hero = hero;
     next();
 }
-app.use(express.json(), debug, transformName);
+
+const superHeroes = [
+    {
+        name: "Iron Man",
+        power: [
+            "money"
+        ],
+        color: "red",
+        isAlive: true,
+        age: 46,
+        image: "https://blog.fr.playstation.com/tachyon/sites/10/2019/07/unnamed-file-18.jpg?resize=1088,500&crop_strategy=smart"
+    },
+    {
+        name: "Thor",
+        power: [
+            "electricity",
+            "worthy"
+        ],
+        color: "blue",
+        isAlive: true,
+        age: 300,
+        image: "https://www.bdfugue.com/media/catalog/product/cache/1/image/400x/17f82f742ffe127f42dca9de82fb58b1/9/7/9782809465761_1_75.jpg"
+    },
+    {
+        name: "Daredevil",
+        power: [
+            "blind"
+        ],
+        color: "red",
+        isAlive: false,
+        age: 30,
+        image: "https://aws.vdkimg.com/film/2/5/1/1/251170_backdrop_scale_1280xauto.jpg"
+    }
+]
+
+app.use(express.json(), debug);
 
 app.get("/heroes", (_req, res) => {
     // console.log(superHeroes);
@@ -37,12 +72,30 @@ app.get("/heroes/:name/powers", findHero, (req, res) => {
     res.json(req.hero.power);
 })
 
-app.post("/heroes", (req, res) => {
+app.post("/heroes",transformName, (req, res) => {
+    console.log(req.body.name);
+    const superHero = superHeroes.map((hero) => {
+        return hero.name
+    })
+    if (superHero.indexOf(req.body.name) > -1) {
+        res.status(400).send("Hero already exist");
+    }
     superHeroes.push(req.body);
     res.json({
         message: "Héro Ajouté",
         superHeroes
     })
+});
+
+app.patch("/heroes/:name/powers", findHero, (req, res) => {
+    const hero = req.hero;
+
+    hero.power.push(req.body.power);
+    console.log(hero);
+    res.json({
+        message: "Pouvoir ajouté",
+        hero,
+    });
 });
 
 
