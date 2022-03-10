@@ -1,87 +1,85 @@
 const express = require("express");
 const app = express();
-app.use(express.json());
+const fs = require("fs");
+const superHeroes = require('./data/herosData.json');
 
-app.use(function debug(_req, _res, next) {
-    console.log('request received');
+function debug(_req, _res, next) {
+    console.log('request receive');
     next();
-})
+}
 
-const superHeroes = [
-    {
-        name: "Iron Man",
-        power: ["money"],
-        color: "red",
-        isAlive: true,
-        age: 46,
-        image: "https://blog.fr.playstation.com/tachyon/sites/10/2019/07/unnamed-file-18.jpg?resize=1088,500&crop_strategy=smart"
-    },
-    {
-        name: "Thor",
-        power: ["electricity", "worthy"],
-        color: "blue",
-        isAlive: true,
-        age: 300,
-        image: "https://www.bdfugue.com/media/catalog/product/cache/1/image/400x/17f82f742ffe127f42dca9de82fb58b1/9/7/9782809465761_1_75.jpg"
-    },
-    {
-        name: "Daredevil",
-        power: ["blind"],
-        color: "red",
-        isAlive: false,
-        age: 30,
-        image: "https://aws.vdkimg.com/film/2/5/1/1/251170_backdrop_scale_1280xauto.jpg"
-    }
-]
-
-
-
-app.get("/heroes", (_req, res) => {
-    res.json(superHeroes);
-});
-
-app.get("/heroes/:name", (req, res) => {
-    const superHero = superHeroes.find((hero) => {
-        return hero.name === req.params.name;
-    });
-    res.json(superHero);
-});
-
-app.get("/heroes/:name/powers", (req, res) => {
-    const superHero = superHeroes.find((hero) => {
-        return hero.name === req.params.name;
-    });
-    res.json(superHero.power)
-});
-
-function transformName(req, res, next) {
+function transformName(req, _res, next) {
     req.body.name = req.body.name.toLowerCase();
     next();
 }
 
-app.post("/heroes", transformName, (req, res) => {
-    const superHero = superHeroes.map((heros) => {
-        return heros.name.toLowerCase();
-    });
+function findHero(req, _res, next) {
+    const hero = superHeroes.find((hero) => {
+        return (hero.name.toLowerCase().replace(" ", "-") === req.params.name.toLowerCase().replace(" ", "-"));
+    })
+    req.hero = hero;
+    next();
+}
+app.use(express.json(), debug, transformName);
 
+app.get("/heroes", (_req, res) => {
+    console.log(superHeroes);
+    res.json(superHeroes);
+});
 
-    if (superHero.indexOf(req.body.name) > -1) {
-        res.send("ce héro éxiste déjà, rentrez en un autre :D ")
-    } else {
-        superHeroes.push({
-            name: req.body.name,
-            power: req.body.power,
-            color: req.body.color,
-            isAlive: req.body.isAlive,
-            age: req.body.age,
-            image: req.body.image
-        });
-        console.log(superHero.indexOf(req.body.name));
-        res.send('ok, héro ajouté !:)');
-
-    }
-
+app.get("/heroes/:name", findHero, (req, res) => {
+    res.json(req.hero)
 })
+
+app.get("/heroes/:name/powers", findHero, (req, res) => {
+    res.json(req.hero.power);
+})
+
+app.post("/heroes", (req, res) => {
+    superHeroes.push(req.body);
+    res.json(superHeroes)
+});
+
+
+
+// Write content in JSON data (herosData.json)
+
+// app.post("/heroes", transformName, (req, res) => {
+//     const newHero = {
+
+//         name: req.body.name,
+//         power: req.body.power,
+//         color: req.body.color,
+//         isAlive: req.body.isAlive,
+//         age: req.body.age,
+//         image: req.body.image
+
+//     }
+//     fs.readFile('./data/herosData.json', 'utf-8', (err, jsonString) => {
+//         if (err) throw err
+//         const data = JSON.parse(jsonString);
+//         console.log(req.body.name);
+//         console.log(data);
+
+//         if (data.indexOf(req.body.name) > -1) {
+//             res.send("ce hero éxiste déjà")
+//         } else {
+//             data.push(newHero)
+//             fs.writeFile('./data/herosData.json', JSON.stringify(data, null, 2), 'utf-8', err => {
+//                 if (err) throw err
+//                 res.send("hero ajouté")
+//                 console.log('Done!');
+
+//             })
+
+//         }
+
+//     })
+// })
+
+// Method with an export const (heroesData.js)
+
+
 //copy and paste this in postman
 
 // {
@@ -96,6 +94,5 @@ app.post("/heroes", transformName, (req, res) => {
 
 app.listen(8000, () => {
     console.log("Listening on port 8000");
-
 });
 
