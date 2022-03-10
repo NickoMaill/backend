@@ -23,21 +23,26 @@ function findHero(req, _res, next) {
 app.use(express.json(), debug, transformName);
 
 app.get("/heroes", (_req, res) => {
-    console.log(superHeroes);
+    // console.log(superHeroes);
     res.json(superHeroes);
 });
 
 app.get("/heroes/:name", findHero, (req, res) => {
+    // console.log(req.hero);
     res.json(req.hero)
 })
 
 app.get("/heroes/:name/powers", findHero, (req, res) => {
+    // console.log(req.hero.power);
     res.json(req.hero.power);
 })
 
 app.post("/heroes", (req, res) => {
     superHeroes.push(req.body);
-    res.json(superHeroes)
+    res.json({
+        message: "Héro Ajouté",
+        superHeroes
+    })
 });
 
 
